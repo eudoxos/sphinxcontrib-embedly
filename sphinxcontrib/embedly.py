@@ -145,8 +145,21 @@ def html_visit_embedly_sphinx(self, node):
     raise nodes.SkipNode
 
 
+
+def latex_visit_embedly(self,node):
+    'Show hyperlinnk in centered box for in LaTeX'
+    # move \url away from the raw string via %s, see http://stackoverflow.com/questions/7602171/unicode-error-unicodeescape-codec-cant-decode-bytes-string-with-u
+    self.body.append(r'\begin{quote}\begin{center}\fbox{%s{%s}}\end{center}\end{quote}'%('\\url',node['url_or_urls']))
+
+def latex_depart_embedly(self,node):
+    pass
+
+
 def setup(app):
-    app.add_node(embedly, html=(html_visit_embedly_sphinx, None))
+    app.add_node(embedly,
+        html=(html_visit_embedly_sphinx, None),
+        latex=(latex_visit_embedly,latex_depart_embedly)
+    )
     app.add_config_value('embedly_key', None, 'env')
     app.add_config_value('embedly_timeout', DEFAULT_TIMEOUT, 'env')
     app.add_directive('embedly', EmbedlyDirective)
